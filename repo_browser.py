@@ -56,7 +56,9 @@ def callback():
     resp = requests.post(url, post_data, headers=headers)
     data = resp.json()
     if 'error' in data:
-        return redirect(url_for('authorize'))
+        app.logger.error(data['error'])
+        app.logger.error(data['error_description'])
+        return redirect(url_for('landing'))
 
     session['github_access_token'] = data['access_token']
     return redirect(url_for('content'))
@@ -65,7 +67,7 @@ def callback():
 @app.route('/content')
 def content():
     if not session['github_access_token']:
-        return redirect(url_for('authorize'))
+        return redirect(url_for('landing'))
 
     access_token = session['github_access_token']
     github = Github(access_token)
